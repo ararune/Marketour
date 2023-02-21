@@ -47,6 +47,7 @@
 * Docker
 * Spring Boot
 * Thymeleaf
+* Tailwind CSS
 * MySQL
 
 ## Authors
