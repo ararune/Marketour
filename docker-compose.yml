@@ -1,0 +1,22 @@
+version: '3'
+services:
+  marketour:
+    build: .
+    image: ansabic/marketour:0.0.1
+    container_name: marketour
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3307 /marketour
+
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=marketour
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3307:3306"

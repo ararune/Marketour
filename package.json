@@ -1,0 +1,29 @@
+{
+  "name": "marketour",
+  "version": "1.0.0",
+  "description": "<p>The app is intended to provide buying digital tours on its marketplace that are created by tour-guide users, advertisable through the app and can be consumed by tourist users.\r </p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tailwindcss -i ./styles/input.css -o ./css/main.css",
+    "watch": "tailwindcss -i ./styles/input.css -o ./css/main.css --watch",
+    "minify": "npx tailwindcss -o build.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OSS-Java-Seminar-2022/MarkeTour.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OSS-Java-Seminar-2022/MarkeTour/issues"
+  },
+  "homepage": "https://github.com/OSS-Java-Seminar-2022/MarkeTour#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.2.4"
+  },
+  "dependencies": {
+    "location-picker": "^1.1.1"
+  }
+}
