@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit page</title>
+    <link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link crossorigin="" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          rel="stylesheet"/>
+    <script crossorigin=""
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+<div class="pageId" th:id="${tourPage.tourPageId}"></div>
+<div class="mx-auto p-6 bg-white rounded-lg shadow-xl" style="width: 600px">
+    <h1 class="text-2xl font-medium mb-2">Create page</h1>
+    <label class="block text-gray-700 font-medium mb-2" for="body" th:text="'Tour name: ' + ${tourName}">...</label>
+
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" th:text="'Page no: ' + ${page + 1}">Page</label>
+
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="title">Title</label>
+        <input class="border p-2 rounded-lg w-full" id="title" th:value="${tourPage.title}" type="text">
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="body">Body</label>
+        <textarea class="border p-2 rounded-lg w-full" id="body" th:text="${tourPage.body}"></textarea>
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="image">Image</label>
+        <input accept="image/*" class="border p-2 rounded-lg w-full" id="image" name="image" src="/oldValue"
+               th:attr="data-file=${imageFile}"
+               type="file">
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="imageDescription">Image description</label>
+        <input class="border p-2 rounded-lg w-full" id="imageDescription" th:value="${tourPage.image.description}"
+               type="text">
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="audio">Audio</label>
+        <input accept="audio/*" class="border p-2 rounded-lg w-full" id="audio" name="audio"
+               th:attr="data-file=${imageFile}"
+               type="file">
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="audioDescription">Audio description</label>
+        <input class="border p-2 rounded-lg w-full" id="audioDescription" th:value="${tourPage.audio.description}"
+               type="text">
+    </div>
+    <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2" for="map">Location</label>
+        <div class="w-full h-64" id="map"></div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2" for="latitude">Latitude</label>
+            <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                   id="latitude" readonly th:value="${tourPage.location.latitude}" type="text">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2" for="longitude">Longitude</label>
+            <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                   id="longitude" readonly th:value="${tourPage.location.longitude}" type="text">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2" for="locationName">Location name</label>
+            <input class="border p-2 rounded-lg w-full" id="locationName" th:value="${tourPage.location.name}"
+                   type="text">
+        </div>
+        <div class="text-right mt-6">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+                    onclick="savePage()">Save
+            </button>
+        </div>
+    </div>
+
+</div>
+</body>
+<script>
+    let base64EncodedFile = document.getElementById("image").getAttribute("data-file");
+    let byteCharacters = atob(base64EncodedFile);
+    let byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    let byteArray = new Uint8Array(byteNumbers);
+    let file = new File([byteArray], "oldImage" + '.png', {type: 'image/png'});
+
+    let list = new DataTransfer();
+    list.items.add(file);
+
+    let myFileList = list.files;
+
+    document.getElementById('image').files = myFileList;
+
+    let base64EncodedFileAudio = document.getElementById("image").getAttribute("data-file");
+    let byteCharactersAudio = atob(base64EncodedFileAudio);
+    let byteNumbersAudio = new Array(byteCharactersAudio.length);
+    for (let i = 0; i < byteCharactersAudio.length; i++) {
+        byteNumbersAudio[i] = byteCharactersAudio.charCodeAt(i);
+    }
+    let byteArrayAudio = new Uint8Array(byteNumbersAudio);
+    let fileAudio = new File([byteArrayAudio], "oldAudio" + '.mp3', {type: 'audio/mp3'});
+
+    let listAudio = new DataTransfer();
+    listAudio.items.add(fileAudio);
+
+    let myFileListAudio = listAudio.files;
+
+    document.getElementById('audio').files = myFileListAudio;
+</script>
+<script>
+    async function savePage() {
+        let url = "http://localhost:8080/tourPages/addOrEdit";
+        const formData = new FormData();
+        let body = {
+            "pageId": document.getElementsByClassName("pageId").item(0).id,
+            "title": document.getElementById("title").value,
+            "body": document.getElementById("body").value,
+            "latitude": document.getElementById("latitude").value,
+            "longitude": document.getElementById("longitude").value,
+            "imageDescription": document.getElementById("imageDescription").value,
+            "audioDescription": document.getElementById("audioDescription").value,
+            "locationName": document.getElementById("locationName").value
+        };
+        if (Object.values(body).includes(null) || Object.values(body).includes("") || Object.values(body).includes(undefined)) {
+            alert("All fields required!");
+        } else {
+            formData.append("tourPage", JSON.stringify(body));
+            let imageFile = document.getElementById("image").files[0];
+            let audioFile = document.getElementById("audio").files[0];
+            formData.append("image", new Blob([imageFile], {type: imageFile.type}));
+            formData.append("audio", new Blob([audioFile], {type: audioFile.type}));
+            let result = await fetch(url, {
+                method: "post",
+                body: formData
+            });
+            if (result.ok) {
+                window.location.href = "http://localhost:8080/main";
+            } else {
+                alert("All fields are required!");
+            }
+        }
+    }
+</script>
+<script>
+    let map = L.map('map').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    let marker = L.marker([0, 0]).addTo(map);
+
+
+    let lat = document.getElementById("latitude").value;
+    let long = document.getElementById("longitude").value;
+    let pos = {lat: lat, lng: long};
+    map.setView(pos, 13);
+    marker.setLatLng(L.latLng(pos.lat, pos.lng));
+
+    function onMapClick(e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById("latitude").value = e.latlng.lat;
+        document.getElementById("longitude").value = e.latlng.lng;
+    }
+
+
+    map.on('click', onMapClick);
+</script>
+</html>

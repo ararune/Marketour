@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="ie=edge" http-equiv="X-UA-Compatible"/>
+    <title>Edit Tour</title>
+
+    <!-- Import Tailwind CSS -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"/>
+    <link crossorigin="" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          rel="stylesheet"/>
+    <script crossorigin=""
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body class="bg-gray-200">
+<div class="flex justify-center">
+    <div class="w-full max-w-screen-md p-4 rounded-lg bg-white">
+        <h1 class="text-2xl font-medium text-center text-gray-800 mb-4">Edit Tour</h1>
+        <form>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Tour Name</label>
+                <input
+                        class="border border-gray-400 p-2 rounded-lg w-full myTour"
+                        th:id="${existingTour.tourId}"
+                        th:value="${existingTour.name}"
+                        type="text"
+                />
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Tour Description</label>
+                <textarea
+                        class="border border-gray-400 p-2 rounded-lg w-full"
+                        id="description"
+                        th:text="${existingTour.description}"
+                ></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Start Location</label>
+                <div class="w-full h-64" id="mapStart"></div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="latitudeStart">Latitude start</label>
+                    <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                           id="latitudeStart" readonly th:value="${startLatitude}" type="text">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="longitudeStart">Longitude start</label>
+                    <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                           id="longitudeStart" readonly th:value="${startLongitude}" type="text">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="city">City</label>
+                    <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                           id="city" readonly type="text">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="country">Country</label>
+                    <input class="bg-white rounded-lg py-2 px-4 block w-full leading-5 text-gray-700 focus:outline-none focus:shadow-outline-blue-500"
+                           id="country" readonly type="text">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Price</label>
+                <input
+                        class="border border  -gray-400 p-2 rounded-lg w-full"
+                        id="price"
+                        th:value="${existingTour.price}"
+                        type="number"
+                />
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2">Visible on Market</label>
+                <input
+                        id="visibleOnMarket"
+                        th:checked="${existingTour.visibleOnMarket}"
+                        type="checkbox"
+                />
+            </div>
+            <div class="grid grid-cols-3 gap-4 sortable">
+                <div class="bg-white rounded-lg overflow-hidden tPage" th:each="tourPage : ${tourPages}"
+                     th:id="${temp}" th:with="temp = ${tourPage.tourPageId}">
+                    <img
+                            alt="Image"
+                            class="w-full"
+                            th:src="|data:image/png;base64,${imagesBase64.get(tourPage.tourPageId)}|"
+                    />
+                    <h3 class="text-gray-800 font-medium mb-2" th:text="${tourPage.title}"></h3>
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="p-4">
+                                    <button
+                                            class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+                                            th:onclick="editPage([[${tourPage.tourPageId}]])"
+                                            type="reset"
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="p-4" th:if="${tourPages.size() > 1}">
+                                    <button
+                                            class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+                                            th:onclick="deletePage([[${tourPage.tourPageId}]])"
+                                            type="button"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div>
+                <button
+                        class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+                        th:onclick="addNewPage([[${existingTour.tourId}]])" type="reset"
+                >
+                    Add new page
+                </button>
+            </div>
+
+
+            <button
+                    class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mt-4"
+                    onclick="saveTour()"
+                    type="button"
+            >
+                Save Changes
+            </button>
+            <button
+                    class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
+                    onclick="deleteTour()"
+                    type="button"
+            >
+                Delete Tour
+            </button>
+
+        </form>
+    </div>
+</div>
+</body>
+<script>
+    async function deleteTour() {
+        let tourId = document.getElementsByClassName("myTour").item(0).id;
+        let url = "http://localhost:8080/tours/delete/" + tourId;
+        let result = await fetch(url);
+        if (result.ok) {
+            window.location.href = "http://localhost:8080/main";
+        } else {
+            alert(await result.text());
+        }
+    }
+</script>
+<script>
+    function editPage(pageId) {
+        window.location.href = "http://localhost:8080/pageEdit?&pageId=" + pageId;
+    }
+
+    async function deletePage(pageId) {
+        let tourPageIds = [];
+        let tourPages = document.querySelectorAll('.tPage');
+        tourPages.forEach(function (tourPage) {
+            if (tourPage.id.toString() !== pageId.toString()) {
+                tourPageIds.push(tourPage.id);
+            }
+        });
+        let result = await fetch("/tourPages/delete/" + pageId);
+        if (result.ok) {
+            await sortAfterDeletion(tourPageIds);
+            alert(await result.text());
+        }
+        location.reload();
+
+    }
+</script>
+<script>
+    async function saveTour() {
+        let body = {
+            "tourId": document.getElementsByClassName("myTour").item(0).id,
+            "name": document.getElementsByClassName("myTour").item(0).value,
+            "description": document.getElementById("description").value,
+            "city": document.getElementById("city").value,
+            "country": document.getElementById("country").value,
+            "price": document.getElementById("price").value,
+            "visibleOnMarket": document.getElementById("visibleOnMarket").checked
+        };
+        if (Object.values(body).includes(null) || Object.values(body).includes("") || Object.values(body).includes(undefined)) {
+            alert("All fields required!");
+        } else {
+            let result = await fetch("/tours/saveTour", {
+                method: "post",
+                body: JSON.stringify(
+                    body
+                )
+            });
+            if (result.ok) {
+                alert(await result.text());
+                location.reload();
+            } else {
+                alert("All fields required!");
+            }
+        }
+    }
+</script>
+<script>
+    function addNewPage(tourId) {
+        window.location.href = "http://localhost:8080/pageCreate?&tourId=" + tourId;
+    }
+</script>
+<script>
+    let map = L.map('mapStart').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    let marker = L.marker([0, 0]).addTo(map);
+    let initial = {
+        lat: document.getElementById("latitudeStart").value,
+        lng: document.getElementById("longitudeStart").value
+    }
+    marker.setLatLng(initial);
+    map.setView(initial, 13);
+    getCityCountry(initial.lat, initial.lng);
+
+
+    function getCityCountry(lat, lng) {
+        let key = '6d297337290847d097df17106efaecc4';
+        let url = 'https://api.opencagedata.com/geocode/v1/json?q=' + lat + '+' + lng + '&key=' + key;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let city = data.results[0].components.city;
+                let country = data.results[0].components.country;
+                if (city === undefined) {
+                    city = null;
+                }
+                document.getElementById("city").value = city;
+                document.getElementById("country").value = country;
+            })
+            .catch(error => console.log(error));
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
+<script>
+
+    async function sortAfterDeletion(idsAfterDeletion) {
+        let tourId = document.getElementsByClassName("myTour").item(0).id;
+        await fetch("http://localhost:8080/tourPages/reorder/" + tourId, {
+            method: "post",
+            body: JSON.stringify(
+                {
+                    "ids": idsAfterDeletion
+                }
+            )
+        });
+    }
+
+    async function sort(event) {
+        let tourPageIds = [];
+        let tourPages = document.querySelectorAll('.tPage');
+        tourPages.forEach(function (tourPage) {
+            tourPageIds.push(tourPage.id);
+        });
+        let tourId = document.getElementsByClassName("myTour").item(0).id;
+        await fetch("http://localhost:8080/tourPages/reorder/" + tourId, {
+            method: "post",
+            body: JSON.stringify(
+                {
+                    "ids": tourPageIds
+                }
+            )
+        });
+    }
+
+    let sortable = Sortable.create(document.querySelector('.sortable'), {
+        items: '.tPage',
+        onEnd: sort
+    });
+</script>
+</html>
